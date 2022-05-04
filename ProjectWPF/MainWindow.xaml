@@ -1,0 +1,38 @@
+﻿<Window x:Class="ProjectWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProjectWPF"
+        xmlns:wpf="clr-namespace:ProjectWPF"
+        mc:Ignorable="d"
+        Title="Computer Graphics" Height="600" Width="800">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static ApplicationCommands.Close}"
+                    Executed="ExecutedCloseCommand"
+                    CanExecute="CanExecuteCloseCommand" />
+    </Window.CommandBindings>
+    <Grid>
+        <StackPanel>
+            <Menu VerticalAlignment="Top">
+                <MenuItem Header="Файл">
+                    <MenuItem Header="Выход" Command="ApplicationCommands.Close"/>
+                </MenuItem>
+                <MenuItem Header="Задания">
+                    <MenuItem Header="Мозайка" Click="Mosaic_Click"/>
+                    <MenuItem Header="Преобразование цвета" Click="ColorConversion_Click"/>
+                    <MenuItem Header="Чтение BMP" Click="BmpReading_Click"/>
+                    <MenuItem Header="Сохранить в BMP" Click="BmpSaving_Click"/>
+                    <MenuItem Header="LZW кодирование" Click="LzwCoding_Click"/>
+                    <MenuItem Header="Примитивы" Click="Primitives_Click"/>
+                    <MenuItem Header="Отсечение">
+                        <MenuItem Header="Отсечение отрезка" Click="Clipping_Click"/>
+                        <MenuItem Header="Отсечение многоугольника" Click="ClippingPolygon_Click"/>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+            <Canvas x:Name="Canvas" HorizontalAlignment="Left">
+            </Canvas>
+        </StackPanel>
+    </Grid>
+</Window>

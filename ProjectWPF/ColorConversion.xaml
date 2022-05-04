@@ -1,0 +1,70 @@
+<UserControl x:Class="ProjectWPF.ColorConversion"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:local="clr-namespace:ProjectWPF"
+             mc:Ignorable="d"
+             d:DesignWidth="300">
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock>HSB</TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <xctk:ShortUpDown Grid.Column="0"  x:Name="Hsb1"
+                                  Margin="0 5 5 10"
+                                  Value="0"
+                                  Maximum="360"
+                                  Minimum="0"
+                                  ValueChanged="Hsb_ValueChanged">
+                </xctk:ShortUpDown>
+                <xctk:ByteUpDown Grid.Column="1" x:Name="Hsb2"
+                                 Margin="0 5 5 10"
+                                 Value="0"
+                                 Maximum="100"
+                                 ValueChanged="Hsb_ValueChanged">
+                </xctk:ByteUpDown>
+                <xctk:ByteUpDown Grid.Column="2" x:Name="Hsb3"
+                                 Margin="0 5 5 10"
+                                 Value="0"
+                                 Maximum="100"
+                                 ValueChanged="Hsb_ValueChanged">
+                </xctk:ByteUpDown>
+            </Grid>
+            <TextBlock>XYZ</TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <xctk:ByteUpDown Grid.Column="0"  x:Name="Xyz1"
+                                 Margin="0 5 5 10"
+                                 Value="0"
+                                 Maximum="95"
+                                 ValueChanged="Xyz_ValueChanged">
+                </xctk:ByteUpDown>
+                <xctk:ByteUpDown Grid.Column="1" x:Name="Xyz2"
+                                 Margin="0 5 5 10"
+                                 Value="0"
+                                 Maximum="100"
+                                 ValueChanged="Xyz_ValueChanged">
+                </xctk:ByteUpDown>
+                <xctk:ByteUpDown Grid.Column="2" x:Name="Xyz3"
+                                 Margin="0 5 5 10"
+                                 Value="0"
+                                 Maximum="109"
+                                 ValueChanged="Xyz_ValueChanged">
+                </xctk:ByteUpDown>
+            </Grid>
+            
+            <xctk:ColorPicker x:Name="ClrView" Margin="0 10 0 0" SelectedColor="Black">
+            </xctk:ColorPicker>
+        </StackPanel>
+    </Grid>
+</UserControl>

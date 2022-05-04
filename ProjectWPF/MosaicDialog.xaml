@@ -1,0 +1,49 @@
+﻿<Window x:Class="ProjectWPF.MosaicDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:ProjectWPF"
+        mc:Ignorable="d"
+        Title="MosaicData" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen">
+    
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock>Введите ширину:</TextBlock>
+            <xctk:ShortUpDown x:Name="widthValue"
+                              MinWidth="250"
+                              Margin="0 5 0 10"
+                              Value="800">
+            </xctk:ShortUpDown>
+        
+            <TextBlock>Введите высоту:</TextBlock>
+            <xctk:ShortUpDown x:Name="heightValue"
+                              MinWidth="250"
+                              Margin="0 5 0 10"
+                              Value="600">
+            </xctk:ShortUpDown>
+
+            <TextBlock>Выберите размеры блоков</TextBlock>
+            <ComboBox x:Name="selectedBlockSize">
+                <ComboBoxItem IsSelected="True">2x2</ComboBoxItem>
+                <ComboBoxItem>4x4</ComboBoxItem>
+                <ComboBoxItem>8x8</ComboBoxItem>
+            </ComboBox>
+            
+            <xctk:ColorPicker x:Name="clrPcker_First" Margin="0 10 0 0" SelectedColor="Red">
+            </xctk:ColorPicker>
+            <xctk:ColorPicker x:Name="clrPcker_Second" Margin="0 10 0 0" SelectedColor="Green">
+            </xctk:ColorPicker>
+            <xctk:ColorPicker x:Name="clrPcker_Third" Margin="0 10 0 0" SelectedColor="Blue">
+            </xctk:ColorPicker>
+            <xctk:ColorPicker x:Name="clrPcker_Fourth" Margin="0 10 0 0" SelectedColor="Yellow">
+            </xctk:ColorPicker>
+            
+            <WrapPanel Grid.Row="3" HorizontalAlignment="Right" Margin="0,15,0,0">
+                <Button IsDefault="True" Click="Accept_Click" MinWidth="60" Margin="0,0,10,0">OK</Button>
+                <Button IsCancel="True" MinWidth="60">Отмена</Button>
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</Window>
