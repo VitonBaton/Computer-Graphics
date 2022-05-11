@@ -19,10 +19,28 @@ namespace ProjectWPF.Drawing.Primitives
         public IEnumerable<Point> IntersectWith(Polygon polygon)
         {
             var thisLine = this;
-            return polygon.Lines
+            
+            var x1 = this.P1.X;
+            var y1 = this.P1.Y;
+            var x2 = this.P2.X;
+            var y2 = this.P2.Y;
+            
+            var points = polygon.Lines
                 .Select(line => line.IntersectWith(thisLine))
                 .Where(p => p.HasValue)
-                .Select(p => p.Value);
+                .Select(p => p.Value)
+                .OrderBy(point =>
+                {
+                    if (!(Math.Abs(x1 - x2) < 0.0001)) return (point.X - x1) / (x2 - x1);
+                    
+                    if (Math.Abs(y1 - y2) < 0.0001)
+                    {
+                        return 0;
+                    }
+
+                    return (point.Y - y1) / (y2 - y1);
+                });
+            return points;
         }
         
         public Point? IntersectWith(Line line)
