@@ -6,43 +6,100 @@ namespace ProjectWPF.Drawing
     {
         public static (short H, byte S, byte V) RgbToHsv(byte R, byte G, byte B)
         {
-            const double tolerance = 0.00001;
+            // const double tolerance = 0.00001;
+            //
+            // var r = R / 255d;
+            // var g = G / 255d;
+            // var b = B / 255d;
+            //
+            // var max = Math.Max(r, Math.Max(g, b));
+            // var min = Math.Min(r, Math.Min(g, b));
+            //
+            // double h;
+            //
+            // switch (Math.Abs(max - r) < tolerance)
+            // {
+            //     case true when G >= B:
+            //         h = 60 * (g - b) / (max - min) + 0;
+            //         break;
+            //     case true when G < B:
+            //         h = 60 * (g - b) / (max - min) + 360;
+            //         break;
+            //     default:
+            //     {
+            //         if (Math.Abs(max - g) < tolerance)
+            //         {
+            //             h = 60 * (b - r) / (max - min) + 120;
+            //         }
+            //         else
+            //         {
+            //             h = 60 * (b - r) / (max - min) + 120;
+            //         }
+            //
+            //         break;
+            //     }
+            // }
+            //
+            // var s = (Math.Abs(max) < tolerance) ? 0 : 1 - min / max;
+            //
+            // return ((short) Math.Round(h), (byte) Math.Round(s * 100), (byte) Math.Round(max * 100));
             
+            const double tolerance = 0.00001;
+    
             var r = R / 255d;
             var g = G / 255d;
             var b = B / 255d;
 
             var max = Math.Max(r, Math.Max(g, b));
             var min = Math.Min(r, Math.Min(g, b));
+            var delMax = max - min;             //Delta RGB value
 
-            double h;
+            var V = max;
 
-            switch (Math.Abs(max - r) < tolerance)
+            double H = 0, S = 0;
+    
+            if ( delMax == 0 )                     //This is a gray, no chroma...
             {
-                case true when G >= B:
-                    h = 60 * (g - b) / (max - min) + 0;
-                    break;
-                case true when G < B:
-                    h = 60 * (g - b) / (max - min) + 360;
-                    break;
-                default:
-                {
-                    if (Math.Abs(max - g) < tolerance)
-                    {
-                        h = 60 * (b - r) / (max - min) + 120;
-                    }
-                    else
-                    {
-                        h = 60 * (b - r) / (max - min) + 120;
-                    }
+                H = 0;
+                S = 0;
+            }
+            else                                    //Chromatic data...
+            {
+                S = delMax / max;
 
-                    break;
-                }
+                var del_R = (((max - r) / 6) + (delMax / 2)) / delMax;
+                var del_G = (((max - g) / 6) + (delMax / 2)) / delMax;
+                var del_B = (((max - b) / 6) + (delMax / 2)) / delMax;
+
+                if (Math.Abs(r - max) < tolerance) H = del_B - del_G;
+                else if (Math.Abs(g - max) < tolerance) H = (1 / 3d) + del_R - del_B;
+                else if (Math.Abs(b - max) < tolerance) H = (2 / 3d) + del_G - del_R;
+
+                if (H < 0) H += 1;
+                if (H > 1) H -= 1;
             }
 
-            var s = (Math.Abs(max) < tolerance) ? 0 : 1 - min / max;
+            var varH = Math.Round(H * 360);
+            if (varH > 360)
+            {
+                varH = 360;
+            }
+    
+            var varS = Math.Round(S * 100);
+    
+            if (varS > 100)
+            {
+                varS = 100;
+            }
+    
+            var varV = Math.Round(V * 100);
+    
+            if (varV > 100)
+            {
+                varV = 100;
+            }
 
-            return ((short) Math.Round(h), (byte) Math.Round(s * 100), (byte) Math.Round(max * 100));
+            return ((short) varH, (byte) varS, (byte) varV);
         }
         
         public static (byte R,byte G,byte B) HsvToRgb(short h, byte s, byte v)
