@@ -9,13 +9,15 @@ using System.Windows.Media.Imaging;
 using ProjectWPF.Drawing.ClippingAlgorithms.LineClipping;
 using ProjectWPF.Drawing.ClippingAlgorithms.PolygonClipping;
 using ProjectWPF.Drawing.Primitives;
+using ProjectWPF.Drawing.RasterisationAlgorithms;
 using Point = ProjectWPF.Drawing.Primitives.Point;
 
 namespace ProjectWPF.Drawing
 {
     public static class PrimitivesDrawerExtension
     {
-        public static void DrawLineP(this WriteableBitmap bitmap, Line line, Color color, Rect? clipRect = null)
+        public static void DrawLineP(this WriteableBitmap bitmap, Line line, Color color,
+            IRasterisationAlgorithm drawAlg, Rect? clipRect = null)
         {
             using (bitmap.GetBitmapContext())
             {
@@ -36,54 +38,13 @@ namespace ProjectWPF.Drawing
                 var alg = new CohenSutherlandAlgorithm();
 
                 var newLine = alg.Clip(line, new Rect(topX, topY, num1, num2));
-                
+
                 if (newLine is null)
                 {
                     return;
                 }
 
-                var x1 = (int) newLine.Value.P1.X;
-                var y1 = (int) newLine.Value.P1.Y;
-                var x2 = (int) newLine.Value.P2.X;
-                var y2 = (int) newLine.Value.P2.Y;
-                
-                if (x1 == x2 && y1 == y2)
-                {
-                    bitmap.SetPixel(x1, y1, color);
-                    return;
-                }
-                
-                var steep = Math.Abs(y2 - y1) > Math.Abs(x2 - x1); // Проверяем рост отрезка по оси икс и по оси игрек
-                // Отражаем линию по диагонали, если угол наклона слишком большой
-                if (steep)
-                {
-                    (x1, y1) = (y1, x1);
-                    (x2, y2) = (y2, x2);
-                }
-
-                // Если линия растёт не слева направо, то меняем начало и конец отрезка местами
-                if (x1 > x2)
-                {
-                    (x1, x2) = (x2, x1);
-                    (y1, y2) = (y2, y1);
-                }
-
-                var dx = x2 - x1;
-                var dy = Math.Abs(y2 - y1);
-                var error = dx /
-                            2; // Здесь используется оптимизация с умножением на dx, чтобы избавиться от лишних дробей
-                var yStep = (y1 < y2) ? 1 : -1; // Выбираем направление роста координаты y
-                var y = y1;
-                for (var x = x1; x <= x2; x++)
-                {
-                    bitmap.SetPixel(steep ? y : x, steep ? x : y, color); // Не забываем вернуть координаты на место
-                    error -= dy;
-                    if (error < 0)
-                    {
-                        y += yStep;
-                        error += dx;
-                    }
-                }
+                drawAlg.DrawLine(bitmap, newLine.Value, color);
             }
         }
 
@@ -124,7 +85,7 @@ namespace ProjectWPF.Drawing
         }
 
         public static void DrawPolygon(this WriteableBitmap bitmap, Polygon polygon, Color color,
-            Polygon? clipPolygon = null)
+            IRasterisationAlgorithm drawAlg, Polygon? clipPolygon = null, Point? center = null)
         {
             IEnumerable<Line> lines = polygon.Lines;
             if (clipPolygon != null)
@@ -139,9 +100,17 @@ namespace ProjectWPF.Drawing
                 lines = newPolygon;
             }
 
+            if (center != null)
+            {
+                lines = lines.Select(line => new Line(
+                    new Point(center.Value.X + line.P1.X, center.Value.Y - line.P1.Y),
+                    new Point(center.Value.X + line.P2.X, center.Value.Y - line.P2.Y)
+                ));
+            }
+            
             foreach (var line in lines)
             {
-                bitmap.DrawLineP(line, color);
+                bitmap.DrawLineP(line, color,drawAlg);
             }
         }
     }

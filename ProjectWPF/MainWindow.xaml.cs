@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ProjectWPF.Drawing;
+using ProjectWPF.Drawing.AffineTransformations;
 using ProjectWPF.Drawing.Primitives;
+using ProjectWPF.Drawing.RasterisationAlgorithms;
 using ProjectWPF.Images.Bitmap;
 using Image = System.Windows.Controls.Image;
 using Point = ProjectWPF.Drawing.Primitives.Point;
@@ -22,6 +25,7 @@ namespace ProjectWPF
 
         private GraphicParamsDialog _paramsDialog = new GraphicParamsDialog();
 
+        private IRasterisationAlgorithm _drawAlg = RasterizationAlgorithms.Bresenham;
 
         public MainWindow()
         {
@@ -201,7 +205,7 @@ namespace ProjectWPF
                 Shift = _paramsDialog.SelectedShift
             };
 
-            drawer.Draw(bitmap);
+            drawer.Draw(bitmap, _drawAlg);
 
             var image = new Image
             {
@@ -269,9 +273,9 @@ namespace ProjectWPF
                     Console.WriteLine();
                     bitmap.Clear();
                     bitmap.DrawRectangle((int) rect.X, (int) rect.Y, (int) rect.Right, (int) rect.Bottom, Colors.Black);
-                    bitmap.DrawLineP(line1, Colors.Red, rect);
-                    bitmap.DrawLineP(line2, Colors.Blue, rect);
-                    bitmap.DrawLineP(line3, Colors.Green, rect);
+                    bitmap.DrawLineP(line1, Colors.Red, _drawAlg, rect);
+                    bitmap.DrawLineP(line2, Colors.Blue, _drawAlg, rect);
+                    bitmap.DrawLineP(line3, Colors.Green, _drawAlg, rect);
                 }
             };
         }
@@ -292,15 +296,14 @@ namespace ProjectWPF
             Canvas.Width = image.Width;
             Canvas.Height = image.Height;
 
-            var clipPolygon = new Polygon(new(double X,double Y)[] {(20, 20), (150, 20), (150, 150), (20, 150)});
-            var polygon = new Polygon(new(double X,double Y)[] {(10, 10), (50, 40), (200, 20), (50, 80)});
-
-            (double x, double y) = (50, 50);
-
-            clipPolygon.AddVector(20, 20);
-            
-            bitmap.DrawPolygon(polygon, Colors.Red, clipPolygon);
-            bitmap.DrawPolygon(clipPolygon,Colors.Black);
+            // var clipPolygon = new Polygon(new(double X,double Y)[] {(20, 20), (150, 20), (150, 150), (20, 150)});
+            // var polygon = new Polygon(new(double X,double Y)[] {(10, 10), (50, 40), (200, 20), (50, 80)});
+            //
+            // clipPolygon = AffineTransformationsApplier.Apply(clipPolygon,
+            //     AffineTransformations.Translation(20, 20));
+            //
+            // bitmap.DrawPolygon(polygon, Colors.Red, _drawAlg, clipPolygon);
+            // bitmap.DrawPolygon(clipPolygon,Colors.Black, _drawAlg);
             image.MouseMove += PolygonIntersection(image, bitmap);
         }
 
@@ -309,22 +312,106 @@ namespace ProjectWPF
             var clipPolygon = new Polygon(new(double X,double Y)[]
                 {(82, 28), (177, 89), (82, 159), (92, 116), (0, 116), (0, 71), (92, 71)});
             var polygon = new Polygon(new (double, double)[] {(40, 40), (200, 160), (800, 80), (200, 320)});
-            bitmap.DrawPolygon(polygon, Colors.Red, clipPolygon);
+            //bitmap.DrawPolygon(polygon, Colors.Red, _drawAlg, clipPolygon);
 
             (double x, double y) = (88, 88);
-            
+            //(double x, double y) = (0, 0);
             polygon.AddVector(50,50);
-            
+            //clipPolygon.AddVector(205, 135);
+            bitmap.DrawPolygon(polygon, Colors.Red, _drawAlg, clipPolygon);
             return (o, args) =>
             {
                 var point = args.GetPosition(image);
-                clipPolygon.AddVector(point.X - x, point.Y - y);
+                clipPolygon = AffineTransformationsApplier.Apply(clipPolygon,
+                    AffineTransformations.Translation(point.X - x, point.Y - y));// .AddVector(point.X - x, point.Y - y);
                 (x, y) = (point.X, point.Y);
                 
                 bitmap.Clear();
-                bitmap.DrawPolygon(clipPolygon, Colors.Black);
-                bitmap.DrawPolygon(polygon, Colors.Red, clipPolygon);
+                bitmap.DrawPolygon(polygon, Colors.Red, _drawAlg, clipPolygon);
+                bitmap.DrawPolygon(clipPolygon, Colors.Black, _drawAlg);
             };
+        }
+
+
+        private void Affine_Click(object sender, RoutedEventArgs e)
+        {
+            var (width, height) = (1024, 1024);
+
+            var bitmap = BitmapFactory.New(width, height);
+            var image = new Image
+            {
+                Width = width,
+                Height = height,
+                Source = bitmap
+            };
+            Canvas.Children.Clear();
+            Canvas.Children.Add(image);
+            Canvas.Width = image.Width;
+            Canvas.Height = image.Height;
+
+            var polygon = new Polygon(new(double X,double Y)[]
+                {(82, 28), (177, 89), (82, 159), (92, 116), (0, 116), (0, 71), (92, 71)});
+            var center = new Point(100, 200);
+
+            bitmap.DrawCircleP((int)center.X, (int)center.Y, 10, Colors.Aqua);
+            bitmap.DrawPolygon(AffineTransformationsApplier.Apply(polygon, AffineTransformations.Rotation(30)),
+                Colors.Yellow, _drawAlg, center: center);
+            bitmap.DrawPolygon(AffineTransformationsApplier.Apply(polygon,
+                    AffineTransformations.Translation(20 + 187, 20)),
+                Colors.Red, _drawAlg, center: center);
+            bitmap.DrawPolygon(AffineTransformationsApplier.Apply(polygon),
+                Colors.Black, _drawAlg, center: center);
+            
+            bitmap.DrawPolygon(AffineTransformationsApplier.Apply(polygon,
+                    AffineTransformations.Translation(20, -150),
+                    AffineTransformations.Dilatation(1.4,1.4)),
+                Colors.Blue, _drawAlg, center: center);
+
+            bitmap.DrawPolygon(AffineTransformationsApplier.Apply(polygon,
+                    AffineTransformations.Translation(-220, -350),
+                    AffineTransformations.Dilatation(1.4, 1.4),
+                    AffineTransformations.Rotation(90)),
+                Colors.Fuchsia, _drawAlg, center: center);
+        }
+
+        private void Antialiasing_Click(object sender, RoutedEventArgs e)
+        {
+            var (width, height) = (1024, 1024);
+
+            var bitmap = BitmapFactory.New(width, height);
+            var image = new Image
+            {
+                Width = width,
+                Height = height,
+                Source = bitmap
+            };
+            Canvas.Children.Clear();
+            Canvas.Children.Add(image);
+            Canvas.Width = image.Width;
+            Canvas.Height = image.Height;
+
+            var line = new Line(new Point(20, 20), new Point(200, 150));
+
+            var line100 = new Line(new Point(20, 20), new Point(120, 150));
+            
+            bitmap.DrawLineP(line100,Colors.Black,RasterizationAlgorithms.Wu);
+            
+            bitmap.DrawLineP(line,Colors.DarkRed, RasterizationAlgorithms.Bresenham);
+            
+            var line2 = new Line(new Point(20, 40), new Point(200, 170));
+            bitmap.DrawLineP(line2,Colors.DarkRed, RasterizationAlgorithms.Wu);
+            
+            var line3 = new Line(new Point(400, 20), new Point(370, 150));
+            
+            bitmap.DrawLineP(line3,Colors.DarkRed, RasterizationAlgorithms.Bresenham);
+            
+            var line4 = new Line(new Point(400, 70), new Point(370, 200));
+            bitmap.DrawLineP(line4,Colors.DarkRed, RasterizationAlgorithms.Wu);
+        }
+
+        private void Aliasing_Click(object sender, RoutedEventArgs e)
+        {
+            _drawAlg = ((MenuItem) sender).IsChecked ? RasterizationAlgorithms.Wu : RasterizationAlgorithms.Bresenham;
         }
     }
 }

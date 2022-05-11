@@ -29,6 +29,10 @@
                         <MenuItem Header="Отсечение отрезка" Click="Clipping_Click"/>
                         <MenuItem Header="Отсечение многоугольника" Click="ClippingPolygon_Click"/>
                     </MenuItem>
+                    <MenuItem Header="Афинные преобразования" Click="Affine_Click"/>
+                    <MenuItem Header="Тест сглаживаний" Click="Antialiasing_Click"/>
+                </MenuItem>
+                <MenuItem Header="Сглаживание" IsCheckable="True" IsChecked="False" Click="Aliasing_Click">
                 </MenuItem>
             </Menu>
             <Canvas x:Name="Canvas" HorizontalAlignment="Left">

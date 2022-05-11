@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ProjectWPF.Drawing.Primitives;
+using ProjectWPF.Drawing.RasterisationAlgorithms;
 using Point = ProjectWPF.Drawing.Primitives.Point;
 
 namespace ProjectWPF.Drawing
@@ -17,7 +18,7 @@ namespace ProjectWPF.Drawing
         
         public int Coeff { get; set; }
 
-        public void Draw(WriteableBitmap bitmap)
+        public void Draw(WriteableBitmap bitmap, IRasterisationAlgorithm drawAlg)
         {
             short h;
             byte s = 100;
@@ -39,13 +40,15 @@ namespace ProjectWPF.Drawing
                     new Point(0, center.Y),
                     new Point((int) bitmap.Width - 1, center.Y)
                 ),
-                Colors.Black);
+                Colors.Black,
+                drawAlg);
             
             bitmap.DrawLineP(new Line(
                     new Point(center.X, 0),
                     new Point(center.X, (int) bitmap.Height - 1)
                 ),
-                Colors.Black);
+                Colors.Black,
+                drawAlg);
             
             // double F1(double angle) => (1 + Math.Sin(Math.Sqrt(angle))) / 3;
             // double F2(double angle) => 1;
@@ -77,7 +80,8 @@ namespace ProjectWPF.Drawing
                         new Point(center.X + first.X, center.Y - first.Y),
                         new Point(center.X + second.X, center.Y - second.Y)
                     ),
-                    color);
+                    color,
+                    drawAlg);
             }
 
             var r1 = (int) Math.Round(Coeff * lengths1.Min());
