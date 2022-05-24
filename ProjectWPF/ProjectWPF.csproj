@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net48</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Extended.Wpf.Toolkit" Version="4.2.0" />
+      <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+      <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
+    </ItemGroup>
+
+</Project>
